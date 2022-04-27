@@ -62,19 +62,19 @@ public class TechnicienExterieur extends Personne implements AValider
         this._validation = false;
     }
     
-    public TechnicienExterieur(String _matricule, boolean _validation) {
+    public TechnicienExterieur(String _matricule) {
         super();
         this._matricule = _matricule;
         this._validation = false;
     }
 
-    public TechnicienExterieur(String _matricule, boolean _validation, String _nom, String _prenom, String _adresse, String _numtel) {
+    public TechnicienExterieur(String _matricule, String _nom, String _prenom, String _adresse, String _numtel) {
         super(_nom, _prenom, _adresse, _numtel);
         this._matricule = _matricule;
         this._validation = false;
     }
 
-    public TechnicienExterieur(String _matricule, boolean _validation, String _nom, String _prenom) {
+    public TechnicienExterieur(String _matricule, String _nom, String _prenom) {
         super(_nom, _prenom);
         this._matricule = _matricule;
         this._validation = false;
@@ -83,5 +83,14 @@ public class TechnicienExterieur extends Personne implements AValider
     @Override
     public String toString() {
         return "TechnicienExterieur{" + "_matricule=" + _matricule + ", _nom=" + _nom + ", _prenom=" + _prenom + ", _adresse=" + _adresse + ", _numtel=" + _numtel +'}';
+    }
+    
+    public static void main(String[] args) {
+
+        TechnicienExterieur c1 = new TechnicienExterieur();
+        TechnicienExterieur c2 = new TechnicienExterieur("MAT0001","Arnone","Matteo");
+        
+        System.out.print("\n\nc1:\n" + c1);
+        System.out.print("\n\nc2:\n" + c2);
     }
 }

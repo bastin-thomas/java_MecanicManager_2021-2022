@@ -10,7 +10,7 @@ import authenticate.AValider;
  *
  * @author student
  */
-public class PersonnelGarage extends Personne implements AValider
+public abstract class PersonnelGarage extends Personne implements AValider
 {    
     protected String _matricule;
     protected boolean _validation;
@@ -46,10 +46,6 @@ public class PersonnelGarage extends Personne implements AValider
         this._matricule = _matricule;
     }
 
-    @Override
-    public String toString() {
-        return "PersonnelGarage{" + "_matricule=" + _matricule + ", _nom=" + _nom + ", _prenom=" + _prenom + ", _adresse=" + _adresse + ", _numtel=" + _numtel + '}';
-    }
 
     @Override
     public String getId() {

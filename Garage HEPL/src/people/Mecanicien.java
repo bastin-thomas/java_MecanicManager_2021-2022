@@ -71,6 +71,15 @@ public class Mecanicien extends PersonnelGarage
 
     @Override
     public String toString() {
-        return "Mecanicien{" + "_matricule=" + _matricule + "Specialite=" + Specialite + ", _nom=" + _nom + ", _prenom=" + _prenom + ", _adresse=" + _adresse + ", _numtel=" + _numtel + '}';
+        return "Mecanicien{" + "_matricule=" + _matricule + ", Specialite=" + Specialite + ", _nom=" + _nom + ", _prenom=" + _prenom + ", _adresse=" + _adresse + ", _numtel=" + _numtel + '}';
+    }
+    
+    public static void main(String[] args) {
+
+        Mecanicien c1 = new Mecanicien();
+        Mecanicien c2 = new Mecanicien("MAT0001","Arnone","Matteo");
+        
+        System.out.print("\n\nc1:\n" + c1);
+        System.out.print("\n\nc2:\n" + c2);
     }
 }

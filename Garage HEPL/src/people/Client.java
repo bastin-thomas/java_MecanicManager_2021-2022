@@ -73,4 +73,18 @@ public class Client extends Personne
     public void setId(String id) {
         setNumClient(Integer.parseInt(id));
     }
+    
+    public static void main(String[] args) {
+        Client c1 = new Client();   
+        c1.setId("10");
+        
+        int Id; 
+        Id = c1.getNumClient();
+        
+        Client c2 = new Client("Arnone","Matteo","une adresse","047039342384");
+        
+        System.out.print("\n\nc1:\n" + c1);
+        System.out.print("\n\nc2:\n" + c2);
+        System.out.print("\n\nId:\n" + Id + "\n\n");
+    }
 }

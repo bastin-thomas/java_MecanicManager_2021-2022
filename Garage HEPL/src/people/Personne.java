@@ -66,6 +66,8 @@ public abstract class Personne implements Identifiable
     public Personne(String _nom, String _prenom) {
         this._nom = _nom;
         this._prenom = _prenom;
+        this._adresse = "NaN";
+        this._numtel = "NaN";
     }
 
     @Override
