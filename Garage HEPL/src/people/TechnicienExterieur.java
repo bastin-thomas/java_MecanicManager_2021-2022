@@ -5,6 +5,7 @@
  */
 package people;
 import authenticate.AValider;
+import java.util.HashMap;
 
 /**
  *
@@ -12,6 +13,13 @@ import authenticate.AValider;
  */
 public class TechnicienExterieur extends Personne implements AValider
 {
+    public static HashMap<String, String> loginExterieur = new HashMap<>();
+    static
+    {
+        loginExterieur.put("vilvens","123");
+        loginExterieur.put("matteo","aze");
+    }
+    
     private String _matricule;
     private boolean _validation;
 

@@ -5,6 +5,7 @@
  */
 package people;
 import authenticate.AValider;
+import java.util.HashMap;
 
 /**
  *
@@ -12,6 +13,14 @@ import authenticate.AValider;
  */
 public abstract class PersonnelGarage extends Personne implements AValider
 {    
+    public static HashMap<String, String> loginGarage = new HashMap<>();
+    
+    static
+    {
+        loginGarage.put("wagner","abc");
+        loginGarage.put("wilvers","xyz");
+    }
+    
     protected String _matricule;
     protected boolean _validation;
 
@@ -66,7 +75,13 @@ public abstract class PersonnelGarage extends Personne implements AValider
 
     @Override
     public boolean validate() {
-        _validation = true;
-        return true;
+        if(_validation == true){
+            _validation = false;
+            return true;
+        }
+        else{
+            _validation = true;
+            return true;
+        }
     }
 }
