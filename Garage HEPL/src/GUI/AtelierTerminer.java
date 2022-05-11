@@ -141,9 +141,9 @@ public class AtelierTerminer extends javax.swing.JDialog {
 
         //On récupère le vecteur:
         Vector tmp = (Vector) model.getDataVector().elementAt(selected);
-        Parent.Container.getList_Travaux_EnCours().remove(selected);
+        Parent.getContainer().getListeTravauxEnCours().remove(selected);
         
-        Parent.Container.getList_Travaux_Fini().add(tmp);
+        Parent.getContainer().getListeTravauxFini().add(tmp);
 
         this.dispose();
     }//GEN-LAST:event_Bouton_OKActionPerformed
@@ -152,9 +152,9 @@ public class AtelierTerminer extends javax.swing.JDialog {
     {
         //On récupère le modèle de la table
         DefaultTableModel model = (DefaultTableModel) Table_ListeTravaux.getModel();
-        for(int i = 0 ; i < Parent.Container.getList_Travaux_EnCours().size() ; i++)
+        for(int i = 0 ; i < Parent.getContainer().getListeTravauxEnCours().size() ; i++)
         {
-            model.addRow((Vector) Parent.Container.getList_Travaux_EnCours().get(i));
+            model.addRow((Vector) Parent.getContainer().getListeTravauxEnCours().get(i));
         }
         Table_ListeTravaux.setModel(model);
         model.fireTableDataChanged();

@@ -15,38 +15,38 @@ import java.util.Vector;
  */
 public class ContainerClass implements Serializable {
     
-    private LinkedList Liste_Travaux;
-    private LinkedList Liste_Travaux_EnCours;
-    private LinkedList Liste_Travaux_Fini;
+    private LinkedList ListeTravaux;
+    private LinkedList ListeTravauxEnCours;
+    private LinkedList ListeTravauxFini;
 
     public ContainerClass() 
     {
-        Liste_Travaux = new LinkedList();
-        Liste_Travaux_EnCours = new LinkedList();
-        Liste_Travaux_Fini = new LinkedList();
+        ListeTravaux = new LinkedList();
+        ListeTravauxEnCours = new LinkedList();
+        ListeTravauxFini = new LinkedList();
     }
     
-    public LinkedList getList_Travaux() {
-        return Liste_Travaux;
+    public LinkedList getListeTravaux() {
+        return ListeTravaux;
     }
     
-    public LinkedList getList_Travaux_EnCours() {
-        return Liste_Travaux_EnCours;
+    public LinkedList getListeTravauxEnCours() {
+        return ListeTravauxEnCours;
     }
 
-    public LinkedList getList_Travaux_Fini() {
-        return Liste_Travaux_Fini;
+    public LinkedList getListeTravauxFini() {
+        return ListeTravauxFini;
     }
     
     public boolean isPontFree(String p)
     {
-        System.out.println(Liste_Travaux_EnCours);
-        if(Liste_Travaux_EnCours.isEmpty()) return true;
+        System.out.println(ListeTravauxEnCours);
+        if(ListeTravauxEnCours.isEmpty()) return true;
         
         //Fonction permettant de vérifier qu'un pont est libre.
-        for(int i = 0 ; i < Liste_Travaux_EnCours.size() ; i++)
+        for(int i = 0 ; i < ListeTravauxEnCours.size() ; i++)
         {
-            Vector tmp = (Vector) Liste_Travaux_EnCours.get(i);
+            Vector tmp = (Vector) ListeTravauxEnCours.get(i);
             if(((String)tmp.lastElement()).equals(p)){
                 return false;
             }
@@ -56,13 +56,13 @@ public class ContainerClass implements Serializable {
     
     public boolean isSolFree()
     {
-        System.out.println(Liste_Travaux_EnCours);
-        if(Liste_Travaux_EnCours.isEmpty()) return true;
+        System.out.println(ListeTravauxEnCours);
+        if(ListeTravauxEnCours.isEmpty()) return true;
         
         //Fonction permettant de vérifier qu'un pont est libre.
-        for(int i = 0 ; i < Liste_Travaux_EnCours.size() ; i++)
+        for(int i = 0 ; i < ListeTravauxEnCours.size() ; i++)
         {
-            Vector tmp = (Vector) Liste_Travaux_EnCours.get(i);
+            Vector tmp = (Vector) ListeTravauxEnCours.get(i);
             if(((String)tmp.lastElement()).equals("Sol")){
                 return false;
             }

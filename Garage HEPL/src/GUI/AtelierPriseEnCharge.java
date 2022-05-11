@@ -142,7 +142,7 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
         DefaultTableModel model = (DefaultTableModel) Table_ListeTravaux.getModel();
         int selected;
         
-        //Si rien cocher, alors on ne fait rien
+        //Si rien coché, alors on ne fait rien
         if((selected = Table_ListeTravaux.getSelectedRow()) == -1 && buttonGroup1.getSelection() == null)
         {
             JOptionPane.showMessageDialog(this,"Veuillez sélectionner un emplacement de Travail et un Travail.","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -184,16 +184,16 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
                     break;
             }
             
-            if(Parent.Container.isPontFree(x) == true)
+            if(Parent.getContainer().isPontFree(x) == true)
             {
                 //On récupère le vecteur:
                 Vector tmp = (Vector) model.getDataVector().elementAt(selected);
-                Parent.Container.getList_Travaux().remove(selected);
+                Parent.getContainer().getListeTravaux().remove(selected);
        
                 
                 //On ajoute le n° de pont au Vecteur, et on le met dans la liste des Travaux en cours
                 tmp.add(x);
-                Parent.Container.getList_Travaux_EnCours().add(tmp);
+                Parent.getContainer().getListeTravauxEnCours().add(tmp);
                 
                 this.dispose();
             }
@@ -204,15 +204,15 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
         
         if(Radio_Sol.isSelected())
         {
-            if(Parent.Container.isSolFree() == true)
+            if(Parent.getContainer().isSolFree() == true)
             {
                 //On récupère le vecteur:
                 Vector tmp = (Vector) model.getDataVector().elementAt(selected);
-                Parent.Container.getList_Travaux().remove(selected);
+                Parent.getContainer().getListeTravaux().remove(selected);
                 
                 //On ajoute le n° de pont au Vecteur, et on le met dans la liste des Travaux en cours
                 tmp.add("Sol");
-                Parent.Container.getList_Travaux_EnCours().add(tmp);
+                Parent.getContainer().getListeTravauxEnCours().add(tmp);
                 
                 this.dispose();
             }
@@ -230,9 +230,9 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
     {
         //On récupère le modèle de la table
         DefaultTableModel model = (DefaultTableModel) Table_ListeTravaux.getModel();
-        for(int i = 0 ; i < Parent.Container.getList_Travaux().size() ; i++)
+        for(int i = 0 ; i < Parent.getContainer().getListeTravaux().size() ; i++)
         {
-            model.addRow((Vector) Parent.Container.getList_Travaux().get(i));
+            model.addRow((Vector) Parent.getContainer().getListeTravaux().get(i));
         }
         Table_ListeTravaux.setModel(model);
     }

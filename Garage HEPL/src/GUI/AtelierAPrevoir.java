@@ -248,7 +248,7 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
         ligneTmp.add(TextArea_Instruction.getText());
         
         //Ajout à la liste située dans la classe Atelier:
-        Parent.Container.getList_Travaux().add(ligneTmp);
+        Parent.getContainer().getListeTravaux().add(ligneTmp);
         
         this.setVisible(false);
         this.dispose();

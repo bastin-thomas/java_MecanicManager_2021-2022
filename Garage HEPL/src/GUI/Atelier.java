@@ -34,7 +34,15 @@ public class Atelier extends javax.swing.JFrame
      * Creates new form Atelier
      */
     public static final String  FilePath = "SavedEnvironment.ser";
-    public ContainerClass Container;
+    private ContainerClass Container;
+
+    public void setContainer(ContainerClass Container) {
+        this.Container = Container;
+    }
+
+    public ContainerClass getContainer() {
+        return Container;
+    }
     
     @SuppressWarnings("Convert2Lambda")
     public Atelier() {
@@ -88,11 +96,11 @@ public class Atelier extends javax.swing.JFrame
             //Load Container:
             ObjectInputStream ObjectIN = new ObjectInputStream(new FileInputStream(FilePath));
             
-            this.Container = (ContainerClass) ObjectIN.readObject();
+            setContainer((ContainerClass) ObjectIN.readObject());
             ObjectIN.close();
             
         } catch (FileNotFoundException ex) {
-            Container = new ContainerClass();
+            setContainer(new ContainerClass());
             
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(Atelier.class.getName()).log(Level.SEVERE, null, ex);
@@ -103,15 +111,13 @@ public class Atelier extends javax.swing.JFrame
     public void SaveContainer() throws FileNotFoundException{
         try {
             ObjectOutputStream ObjectOUT = new ObjectOutputStream(new FileOutputStream(FilePath));
-            ObjectOUT.writeObject(this.Container);
+            ObjectOUT.writeObject(getContainer());
             ObjectOUT.close();
         } catch (IOException ex) {
             Logger.getLogger(Atelier.class.getName()).log(Level.SEVERE, null, ex);
         }      
     } 
-            
-            
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
