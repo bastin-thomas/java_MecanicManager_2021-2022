@@ -1,2 +1,0 @@
-24/05/22 21:57:52>[ApplicationCentrale] Lancement de l'Application
-24/05/22 21:57:52>[ApplicationCentrale] Lancement du Serveur sur le port 50500

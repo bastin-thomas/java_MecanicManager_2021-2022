@@ -1,5 +1,0 @@
-25/05/22 10:40:05>[ApplicationCentrale] Lancement de l'Application
-25/05/22 10:40:05>[ApplicationCentrale] Lancement du Serveur sur le port 50501
-25/05/22 10:41:01>[ApplicationCentrale] Debut Lecture
-25/05/22 10:41:01>[ApplicationCentrale] Nouvel Commande: Libellé: Ecroux,   Type: 8",   Quantité: 100
-25/05/22 10:41:01>[ApplicationCentrale] Fin Lecture

@@ -1,4 +1,0 @@
-25/05/22 11:09:07>[Atelier] Chargement de l'état du programme Atelier
-25/05/22 11:09:13>[Prise en Charge d'un Travail] Ouverture
-25/05/22 11:09:18>[Prise en Charge d'un Travail] Fermeture
-25/05/22 11:10:03>[Atelier] Sauvegarde de l'état du programme Atelier

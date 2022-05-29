@@ -1,3 +1,0 @@
-24/05/22 16:08:48>[Atelier] Chargement de l'état du programme Atelier
-24/05/22 16:08:48>[Login] Login UtilisateurMecanicien{_matricule=M0001, Specialite=Moteur, _nom=Wagner, _prenom=JeanMarc, _adresse=95 UneRueAuHazard 4042 UneCommune, _numtel=04777777777}
-24/05/22 16:09:46>[Atelier] Sauvegarde de l'état du programme Atelier

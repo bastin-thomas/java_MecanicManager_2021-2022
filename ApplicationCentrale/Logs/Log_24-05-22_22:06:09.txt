@@ -1,8 +1,0 @@
-24/05/22 22:06:09>[ApplicationCentrale] Lancement de l'Application
-24/05/22 22:06:09>[ApplicationCentrale] Lancement du Serveur sur le port 50500
-24/05/22 22:06:10>[ApplicationCentrale] Debut Lecture
-24/05/22 22:06:10>[ApplicationCentrale] Aucun Message Reçus
-24/05/22 22:06:10>[ApplicationCentrale] Fin Lecture
-24/05/22 22:06:12>[ApplicationCentrale] Debut Lecture
-24/05/22 22:06:12>[ApplicationCentrale] Aucun Message Reçus
-24/05/22 22:06:12>[ApplicationCentrale] Fin Lecture
