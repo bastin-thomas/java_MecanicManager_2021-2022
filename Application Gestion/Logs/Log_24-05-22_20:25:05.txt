@@ -1,0 +1,2 @@
+24/05/22 20:25:05>[ApplicationCentrale] GUI.Atelier SEVERE: java.io.InvalidClassException: Commandes.Commandes; local class incompatible: stream classdesc serialVersionUID = 5540872502558227581, local class serialVersionUID = -6017088295843778956
+24/05/22 20:25:05>[Atelier] Chargement de l'état du programme Atelier

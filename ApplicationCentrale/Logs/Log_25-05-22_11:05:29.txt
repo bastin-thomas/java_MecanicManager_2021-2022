@@ -1,0 +1,5 @@
+25/05/22 11:05:29>[ApplicationCentrale] Lancement de l'Application
+25/05/22 11:05:29>[ApplicationCentrale] Lancement du Serveur sur le port 50501
+25/05/22 11:05:53>[ApplicationCentrale] Debut Lecture
+25/05/22 11:05:53>[ApplicationCentrale] Nouvel Commande: Libellé: Libellé,   Type: Type,   Quantité: 1
+25/05/22 11:05:53>[ApplicationCentrale] Fin Lecture

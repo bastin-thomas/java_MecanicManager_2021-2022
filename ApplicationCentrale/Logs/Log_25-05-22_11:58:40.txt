@@ -1,0 +1,4 @@
+25/05/22 11:58:40>[ApplicationCentrale] Lancement de l'Application
+25/05/22 11:58:40>[ApplicationCentrale] Lancement du Serveur sur le port 50501
+25/05/22 11:58:42>[ApplicationCentrale] Debut Lecture
+25/05/22 11:58:42>[ApplicationCentrale] Aucun Message Reçus

@@ -1,0 +1,2 @@
+30/05/22 00:33:17>[ApplicationCentrale] Lancement de l'Application
+30/05/22 00:33:17>[ApplicationCentrale] Lancement du Serveur sur le port 50501
