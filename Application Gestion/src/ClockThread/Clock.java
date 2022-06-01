@@ -8,8 +8,6 @@ package ClockThread;
 import GUI.Atelier;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -39,7 +37,7 @@ public class Clock extends Thread {
 
             try {
                 //Attente 1 secondes
-                Thread.sleep(1);
+                Thread.sleep(250);
             } catch (InterruptedException ex) {
                 Parent.Log().PrintLN("ClockThread", "Interruption de l'horloge: " + ex);
                 Thread.currentThread().interrupt();

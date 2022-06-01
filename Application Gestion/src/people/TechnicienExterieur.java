@@ -5,7 +5,6 @@
  */
 package people;
 import authenticate.AValider;
-import java.util.HashMap;
 
 /**
  *

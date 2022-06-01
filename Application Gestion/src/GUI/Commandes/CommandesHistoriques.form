@@ -56,7 +56,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="Label_TravauxAttente">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Historique Travaux :"/>
+        <Property name="text" type="java.lang.String" value="Listes Commandes en Cours:"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="Scroll_TableListeTravaux">
@@ -66,15 +66,13 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTable" name="Table_ListeTravaux">
+        <Component class="javax.swing.JTable" name="Table_Commandes">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="5" rowCount="0">
-                <Column editable="false" title="Type voiture" type="java.lang.Object"/>
-                <Column editable="false" title="Immatriculation" type="java.lang.Object"/>
-                <Column editable="false" title="Propri&#xe9;taire" type="java.lang.Object"/>
-                <Column editable="false" title="Travail" type="java.lang.Object"/>
-                <Column editable="false" title="Remarques" type="java.lang.Object"/>
+              <Table columnCount="3" rowCount="0">
+                <Column editable="false" title="Nom Produit" type="java.lang.Object"/>
+                <Column editable="false" title="Type Produit" type="java.lang.Object"/>
+                <Column editable="false" title="Quantit&#xe9;e" type="java.lang.Object"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">

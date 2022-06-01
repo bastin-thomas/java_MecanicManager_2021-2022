@@ -142,6 +142,7 @@ public class ChoixFormatDate extends javax.swing.JDialog {
 
     private void jButton_OKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_OKActionPerformed
         Vector state = new Vector();
+        
         Locale locale = null;
         String TempsFormat = null;
         String DateFormat = null;
@@ -202,6 +203,7 @@ public class ChoixFormatDate extends javax.swing.JDialog {
         state.add(this.jComboBox_Local.getSelectedIndex());
         state.add(this.jComboBox_Temps.getSelectedIndex());
         state.add(this.jComboBox_Calendrier.getSelectedIndex());
+        
         Parent.getContainer().setEtatFormat(state);
         
         //On set le format dans Atelier

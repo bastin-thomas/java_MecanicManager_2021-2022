@@ -11,6 +11,9 @@ import Commandes.CommandesLubrifiants;
 import Commandes.CommandesPièces;
 import Commandes.CommandesPneux;
 import GUI.Atelier;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import network.NetworkBasicClient;
@@ -29,18 +32,18 @@ public class NewCommande extends javax.swing.JDialog {
      * Creates new form Commande
      */
     @SuppressWarnings("OverridableMethodCallInConstructor")
-    public NewCommande(java.awt.Frame parent, boolean modal, String Name) {
+    public NewCommande(java.awt.Frame parent, boolean modal, String name) {
         super(parent, modal);
         initComponents();
         
         this.Parent = (Atelier) parent;
-        this.Name = Name;
+        this.Name = name;
         
         this.jRadioButton_Normal.setSelected(true);
         
         RefreshUI();
         
-        Client = NetClient();
+        Client = getNetClient();
     }
 
     /**
@@ -243,6 +246,8 @@ public class NewCommande extends javax.swing.JDialog {
 
     private void jButton_EnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_EnvoyerActionPerformed
         
+        
+        //Verification des données encodées
         if(jTextField_Libellé.getText().equals("")) 
         {
             JOptionPane.showMessageDialog(this,"Veuillez encodez le libellé","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -279,7 +284,7 @@ public class NewCommande extends javax.swing.JDialog {
         }
         
         
-        
+        //Recuperation des données dans un objet Commande
         Commandes Cmd = Create();
         
         Cmd.setLibellé(jTextField_Libellé.getText());
@@ -297,28 +302,65 @@ public class NewCommande extends javax.swing.JDialog {
             Cmd.setPriorité(Priorité.PASPRIORITAIRE);
         }
         
-        //Envoie sur le réseau
-        try{
-            String Rep = Cmd.Send(Client);
+        //Envoi au Client de la commande
+        String Rep = "";
+        
             
-            if(Rep.equals("OK")){
-                //Ajout dans l'historique
-                Parent.getContainer().getListeCommandes().add(Cmd);
-                JOptionPane.showMessageDialog(this, "La Commande à été acceptée" + System.lineSeparator() + Cmd ,"Reponse Fournisseur", JOptionPane.INFORMATION_MESSAGE);
-                this.dispose();
+        
+        for(int i = 0 ; i<2 ; i++)
+        {
+            Rep = Cmd.Send(Client);
+            
+            //Recuperation de la réponse
+            if(Rep == null){
+                //Si null, on recrée un objet client, et on renvoie le message avec un temps d'interval de 250ms
+                Client = ResetClient();
+
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NewCommande.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             else{
-                JOptionPane.showMessageDialog(this, "La Commande n'a pas été acceptée","Reponse Fournisseur", JOptionPane.WARNING_MESSAGE);
+                break;
             }
         }
-        catch(java.lang.NullPointerException e){
+            
+        if(Rep == null)
+        {
+            JOptionPane.showMessageDialog(this,"Erreur de connexion au Serveur","Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        } 
+        
+        StringTokenizer Message = new StringTokenizer(Rep,";");
+        String isOk;
+        String commandeString;
+        
+        isOk = Message.nextToken();
+        commandeString = Message.nextToken();
+        
+        if(isOk.equals("OK"))
+        {
+            String date = Message.nextToken();
+            JOptionPane.showMessageDialog(this, "La Commande à été acceptée" + System.lineSeparator() + commandeString + System.lineSeparator() + "Sera Livré le " + date,"Reponse Fournisseur", JOptionPane.INFORMATION_MESSAGE);
+            
+            //Ajout dans l'historique
+            Parent.getContainer().getListeCommandes().add(Cmd);
+            this.dispose();
+            return;
+        }
+        if(isOk.equals("KO"))
+        {
+            JOptionPane.showMessageDialog(this, "La Commande n'a pas été acceptée" + System.lineSeparator() + commandeString,"Reponse Fournisseur", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        else
+        {
             JOptionPane.showMessageDialog(this,"Erreur Réponse inconnue","Erreur", JOptionPane.ERROR_MESSAGE);
-            Client = ResetClient();
         }
     }//GEN-LAST:event_jButton_EnvoyerActionPerformed
 
-    
-    
     
     private Commandes Create(){
         switch(getName()){
@@ -337,7 +379,9 @@ public class NewCommande extends javax.swing.JDialog {
                 return null;
         }
     }
-
+    
+    
+    
     private void RefreshUI(){
         
         if(Parent.getContainer().getListeCommandes().isEmpty()) return;
@@ -347,17 +391,18 @@ public class NewCommande extends javax.swing.JDialog {
         
         for(int i = 0 ; i < Parent.getContainer().getListeCommandes().size() ; i++)
         {
+            //On regarde le nom de la classe de l'objet et on le compare au nom de notre app
             String tmp = Parent.getContainer().getListeCommandes().get(i).getClass().getName();
             
-            if(tmp.equals("Commandes.Commandes"+getName() )){
+            //Si nom app == nom class alors on ajoute
+            if(tmp.equals("Commandes.Commandes"+getName())){
                 model.addElement(Parent.getContainer().getListeCommandes().get(i).toString());
             }
         }
         jList_CommandesEffectuées.setModel(model);
     }
     
-    private NetworkBasicClient NetClient(){
-              
+    private NetworkBasicClient getNetClient(){
         switch(getName()){
             case "Lubrifiants":
                 return Parent.getLubrifiants();            
@@ -379,15 +424,12 @@ public class NewCommande extends javax.swing.JDialog {
     {        
         switch(getName()){
             case "Lubrifiants":
-                Parent.setLubrifiants(CommandesLubrifiants.CreateClient());
                 return Parent.getLubrifiants();            
                     
             case "Pièces":
-                Parent.setPièces(CommandesPièces.CreateClient());
                 return Parent.getPièces();
             
             case "Pneux":
-                Parent.setPneux(CommandesPneux.CreateClient());
                 return Parent.getPneux();
                                             
             default:

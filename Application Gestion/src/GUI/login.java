@@ -30,6 +30,7 @@ public class login extends javax.swing.JFrame {
         Login = new Properties();
         
         try {
+            //Chargement des données
             Login.load(new FileInputStream("Login.properties"));
         }
         catch (FileNotFoundException ex) {
@@ -148,34 +149,15 @@ public class login extends javax.swing.JFrame {
     private void Button_OKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Button_OKActionPerformed
         String tmp;
     
-        if(!TextField_User.getText().equals("")  && !TextField_Pswd.getText().equals("")){           
-            //Si Membre du Personnel Sélectionner:
+        if(!TextField_User.getText().equals("")  && !TextField_Pswd.getText().equals("")){
+            
                 tmp = Login.getProperty(TextField_User.getText() , "KO");
                 if(tmp.equals(TextField_Pswd.getText())){ // si on trouve le nom d'utilisateur et que le mdp est bon
                     
                     this.setVisible(false); //Fermeture de login
-                    Atelier atelier = new Atelier(); //Creation de la fenètre Atelier à la volée
+                    Atelier atelier = new Atelier( TextField_User.getText()); //Creation de la fenètre Atelier à la volée
                     
-                    Personne PerTmp = null;
-                    //Recherche de l'objet représentant l'utilisateur:
-                    for (Iterator it = atelier.getContainer().getUsers().iterator(); it.hasNext();) {
-                        PerTmp = (Personne) it.next();
-                        if(PerTmp.getNom().equals(TextField_User.getText())){    
-                            break;
-                        }
-                    }
-                    
-                    //On set l'utilisateur de l'atelier, si il n'existe pas on le crée
-                    if(PerTmp != null){
-                        atelier.setUser(PerTmp);
-                    }
-                    else{
-                        PerTmp = new Mecanicien(TextField_User.getText(),"Inconnus");
-                        atelier.getContainer().getUsers().add(PerTmp);
-                        atelier.setUser(PerTmp);
-                    }
-                    
-                    atelier.Log().PrintLN("Login","Login Utilisateur" + PerTmp);
+                    atelier.Log().PrintLN("Login","Login Utilisateur" + TextField_User.getText());
                     
                     atelier.setVisible(true); //Affichage Atelier
                     this.dispose(); //Suppression Mémoire de login

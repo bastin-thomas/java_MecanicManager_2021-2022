@@ -20,8 +20,6 @@ import network.NetworkBasicClient;
  * @author student
  */
 
-
-
 public abstract class Commandes implements Serializable {
     
     protected static final Properties Config;
@@ -35,11 +33,11 @@ public abstract class Commandes implements Serializable {
         catch (FileNotFoundException ex) {
             //A remplacer par une jdialog prenant le nom, l'ip et le port distant pour ensuite les ajouter ici.
             Config.setProperty("Ip_Serveur_CommandesLubrifiant",    "127.0.0.1");
-            Config.setProperty("Port_Serveur_CommandesLubrifiant",       "3400");
+            Config.setProperty("Port_Serveur_CommandesLubrifiant",       "50500");
             Config.setProperty("Ip_Serveur_CommandesPièces",        "127.0.0.1");
-            Config.setProperty("Port_Serveur_CommandesPièces",           "3401");
+            Config.setProperty("Port_Serveur_CommandesPièces",           "50501");
             Config.setProperty("Ip_Serveur_CommandesPneux",         "127.0.0.1");
-            Config.setProperty("Port_Serveur_CommandesPneux",            "3402");
+            Config.setProperty("Port_Serveur_CommandesPneux",            "50502");
             
             try {
                 Config.store(new FileOutputStream("Config.properties"),"Fichier de Configuration du Programme: ");
@@ -142,8 +140,17 @@ public abstract class Commandes implements Serializable {
         return this.getClass().getName() + ";" + libellé + ";" + type + ";" + quantité + ";" + priorité ;
     }
     
-    public String Send( NetworkBasicClient c) throws java.lang.NullPointerException
+    
+    public String Send( NetworkBasicClient c) 
     {
-        return c.sendString(getTuple());
+        String r;
+        try{
+            r = c.sendString(getTuple());
+        }
+        catch(java.lang.NullPointerException npe){
+            r = null;
+        }
+        
+        return r;
     }
 }

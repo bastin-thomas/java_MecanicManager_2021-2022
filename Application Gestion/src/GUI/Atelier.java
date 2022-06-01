@@ -22,9 +22,11 @@ import javax.swing.JMenuItem;
 import FichierLogPackage.FichierLog;
 import Container.ContainerClass;
 import ClockThread.Clock;
+import GUI.Commandes.CommandesHistoriques;
 import GUI.Paramètre.ChoixFormatDate;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -55,7 +58,8 @@ public class Atelier extends javax.swing.JFrame
     /**
      * Creates new form Atelier
      */
-    public static final String  FilePath = "SavedEnvironment.ser";
+    
+    public final String  FilePath;
     private ContainerClass Container;
     private Personne User;
     private FichierLog log;
@@ -67,7 +71,7 @@ public class Atelier extends javax.swing.JFrame
     private Clock thread;
     
     @SuppressWarnings({"Convert2Lambda", "OverridableMethodCallInConstructor", "ConvertToTryWithResources"})
-    public Atelier() {
+    public Atelier(String username) {
         initComponents();
         
         log = new FichierLog();
@@ -118,29 +122,35 @@ public class Atelier extends javax.swing.JFrame
             public ActionListener setParams(Atelier parent) {
 
                 this.Parent = parent;
-
                 return this;
             }
         }.setParams((Atelier)this));
-        
         
         //Override Croix de fermeture
         this.setDefaultCloseOperation(Atelier.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter()
         {
+            Atelier Parent;
             @Override
             public void windowClosing(WindowEvent arg0) {
-                try {
-                    SaveContainer();
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(Atelier.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                Parent.SaveContainer();
+                Parent.dispose();
                 System.exit(0);
             }
-        });
+            
+            public WindowListener setParams(Atelier parent) {
+
+                this.Parent = parent;
+                return this;
+            }
+        }.setParams((Atelier)this));
         
         
-        //Chargement de l'état du programme a sa fermeture :
+        
+        
+        FilePath = "SavedEnvironment"+ username +".ser";
+        
+        //Chargement de l'état du programme a son ouverture :
         try {
             //Load Container:
             ObjectInputStream ObjectIN = new ObjectInputStream(new FileInputStream(FilePath));
@@ -176,6 +186,11 @@ public class Atelier extends javax.swing.JFrame
         }
         Log().PrintLN("Atelier","Chargement de l'état du programme Atelier");
         
+        
+        //Init Utilisateur courant
+        User =  searchUser(username);
+        
+        
         //Lancement des Serveurs:
         this.Lubrifiants = CommandesLubrifiants.CreateClient();
         this.Pièces = CommandesPièces.CreateClient();
@@ -186,9 +201,10 @@ public class Atelier extends javax.swing.JFrame
         RefreshUI();
     }
     
+    
     //Permet de Sauvegarder l'état du conteneur, contenant toutes les infos du système.
     @SuppressWarnings("ConvertToTryWithResources")
-    public void SaveContainer() throws FileNotFoundException{
+    public void SaveContainer(){
         try {
             ObjectOutputStream ObjectOUT = new ObjectOutputStream(new FileOutputStream(FilePath));
             ObjectOUT.writeObject(getContainer());
@@ -267,6 +283,28 @@ public class Atelier extends javax.swing.JFrame
             TextField_Sol.setOpaque(true);
         }
         setVisible(true);
+    }
+    
+    
+    private Personne searchUser(String username){
+        Personne PerTmp = null;
+        //Recherche de l'objet représentant l'utilisateur:
+        for (Iterator it = this.getContainer().getUsers().iterator(); it.hasNext();) {
+            PerTmp = (Personne) it.next();
+            if(PerTmp.getNom().equals(username)){    
+                break;
+            }
+        }
+                    
+        //On set l'utilisateur de l'atelier, si il n'existe pas on le crée
+        if(PerTmp != null){
+            return PerTmp;
+        }
+        else{
+            PerTmp = new Mecanicien(username,"Inconnus");
+            this.getContainer().getUsers().add(PerTmp);
+            return PerTmp;
+        }
     }
 
     
@@ -483,6 +521,11 @@ public class Atelier extends javax.swing.JFrame
         Menu_Materiel.add(jSeparator4);
 
         MenuItem_ListeCommandes.setText("Liste commandes");
+        MenuItem_ListeCommandes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItem_ListeCommandesActionPerformed(evt);
+            }
+        });
         Menu_Materiel.add(MenuItem_ListeCommandes);
 
         MenuBar.add(Menu_Materiel);
@@ -665,6 +708,11 @@ public class Atelier extends javax.swing.JFrame
         Popup.setVisible(true);
     }//GEN-LAST:event_MenuItem_CommanderLubrifiantsActionPerformed
 
+    private void MenuItem_ListeCommandesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItem_ListeCommandesActionPerformed
+        CommandesHistoriques Popup = new CommandesHistoriques(this,true);
+        Popup.setVisible(true);
+    }//GEN-LAST:event_MenuItem_ListeCommandesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton CheckBox_Absent;
@@ -726,14 +774,6 @@ public class Atelier extends javax.swing.JFrame
         return log;
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) 
-    {
-        new Atelier().setVisible(true);
-    }
-    
     public NetworkBasicClient getLubrifiants() {
         return Lubrifiants;
     }
@@ -770,4 +810,17 @@ public class Atelier extends javax.swing.JFrame
         this.Pneux = Pneux;
     }
     
+    
+    
+    
+    
+    
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) 
+    {
+        new Atelier("").setVisible(true);
+    }
 }

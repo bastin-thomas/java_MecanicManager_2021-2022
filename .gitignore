@@ -1,9 +1,6 @@
 # Compiled class file
 *.class
 
-*/build/
-*/Logs/
-
 # Log file
 *.log
 
@@ -15,3 +12,13 @@
 
 # Package Files #
 *.ser
+
+/ApplicationCentrale/dist/
+/librairieMyVariousUtils/dist/
+/Application Gestion/dist/
+
+/ApplicationCentrale/build/
+/librairieMyVariousUtils/build/
+/Application Gestion/build/
+
+*/Logs/

@@ -2,17 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package GUI.Travail;
+package GUI.Commandes;
 
+import Commandes.Commandes;
 import GUI.Atelier;
+import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
-import travail.Travail;
-
 /**
  *
  * @author matteoarnone
  */
-public class AtelierHistoriqueTravaux extends javax.swing.JDialog {
+public class CommandesHistoriques extends javax.swing.JDialog {
 
     private final Atelier Parent;
     
@@ -21,9 +21,7 @@ public class AtelierHistoriqueTravaux extends javax.swing.JDialog {
      * @param parent
      * @param modal
      */
-
-    
-    public AtelierHistoriqueTravaux(java.awt.Frame parent, boolean modal) {
+    public CommandesHistoriques(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         //On récupère la ref vers le parent
@@ -42,30 +40,30 @@ public class AtelierHistoriqueTravaux extends javax.swing.JDialog {
 
         Label_TravauxAttente = new javax.swing.JLabel();
         Scroll_TableListeTravaux = new javax.swing.JScrollPane();
-        Table_ListeTravaux = new javax.swing.JTable();
+        Table_Commandes = new javax.swing.JTable();
         Bouton_OK = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        Label_TravauxAttente.setText("Historique Travaux :");
+        Label_TravauxAttente.setText("Listes Commandes en Cours:");
 
-        Table_ListeTravaux.setModel(new javax.swing.table.DefaultTableModel(
+        Table_Commandes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Type voiture", "Immatriculation", "Propriétaire", "Travail", "Remarques"
+                "Nom Produit", "Type Produit", "Quantitée"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        Scroll_TableListeTravaux.setViewportView(Table_ListeTravaux);
+        Scroll_TableListeTravaux.setViewportView(Table_Commandes);
 
         Bouton_OK.setText("OK");
         Bouton_OK.addActionListener(new java.awt.event.ActionListener() {
@@ -112,12 +110,23 @@ public class AtelierHistoriqueTravaux extends javax.swing.JDialog {
     public void RefreshTable()
     {
         //On récupère le modèle de la table
-        DefaultTableModel model = (DefaultTableModel) Table_ListeTravaux.getModel();
-        for(int i = 0 ; i < Parent.getContainer().getListeTravauxFini().size() ; i++)
+        DefaultTableModel model = (DefaultTableModel) Table_Commandes.getModel();
+        for(int i = 0 ; i < Parent.getContainer().getListeCommandes().size() ; i++)
         {
-            model.addRow(((Travail) Parent.getContainer().getListeTravauxFini().get(i)).toVector());
+            Commandes cmd = (Commandes) Parent.getContainer().getListeCommandes().get(i);
+            System.out.println(cmd);
+            
+            Vector vec= new Vector();
+
+            vec.add(cmd.getLibellé());
+            vec.add(cmd.getType());
+            vec.add(cmd.getQuantité());
+            
+            System.out.println(vec);
+            model.addRow(vec);
         }
-        Table_ListeTravaux.setModel(model);
+        
+        Table_Commandes.setModel(model);
     }
     
     
@@ -125,6 +134,6 @@ public class AtelierHistoriqueTravaux extends javax.swing.JDialog {
     private javax.swing.JButton Bouton_OK;
     private javax.swing.JLabel Label_TravauxAttente;
     private javax.swing.JScrollPane Scroll_TableListeTravaux;
-    private javax.swing.JTable Table_ListeTravaux;
+    private javax.swing.JTable Table_Commandes;
     // End of variables declaration//GEN-END:variables
 }

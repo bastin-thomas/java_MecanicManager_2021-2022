@@ -5,32 +5,33 @@
  */
 package applicationcentrale;
 
+import Beans.*;
 import Commandes.*;
 import FichierLogPackage.FichierLog;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.table.DefaultTableModel;
-import network.*;
 
 
 /**
  *
  * @author student
  */
-public class ApplicationCentrale extends javax.swing.JFrame implements Serializable {
+public class ApplicationCentrale extends javax.swing.JFrame {
     
     private Properties Config;
     private FichierLog Log;
-    private boolean status;
-    private NetworkBasicServer Server;
     
+    //Beans
+    ReceivingBean ReceivingB;
+    SearchBean SearchB;
+    PrepareOrderBean PrepareB;
     
     /**
      * Creates new form ApplicationCentrale
@@ -39,22 +40,25 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
     public ApplicationCentrale() {
         initComponents();
         
-        status  = false;
         Log = new FichierLog();
         Config = new Properties();
         
+        //Chargement Fichier Config
         Log.PrintLN("ApplicationCentrale","Lancement de l'Application");
         try {
+            //Tentative de chargement du fichier Config
             Config.load(new FileInputStream("Config.properties"));
         }
         catch (FileNotFoundException ex) {
-            
+            //Si on arrive pas à le charger, On met des valeurs par défaut
             
             //A remplacer par une jdialog prenant le nom, l'ip et le port distant pour ensuite les ajouter ici.
             Config.setProperty("Name",          "Inconnu");
+            Config.setProperty("FilePath",          "" + File.separator + "SavedEnv.ser");
             Config.setProperty("Port",          "50500");
             
             try {
+                //On sauvegarde les valeurs par défaut
                 Config.store(new FileOutputStream("Config.properties"),"Fichier de Configuration du Programme: ");
             }
             catch (IOException ex1) {
@@ -66,15 +70,24 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
             System.exit(2);
         }
         
-        Log.PrintLN("ApplicationCentrale","Lancement du Serveur sur le port " + loadPort());
-        
-        
-        
         //Initialise le nom de la centrale d'achat sur "l'image" et le nom de la jframe
         this.setTitle("Centrale d'Achat - " + Config.getProperty("Name"));
         this.jLabel_Image.setText(Config.getProperty("Name"));
         
-        Server = new NetworkBasicServer( this.loadPort() , this.jCheckBox_MessageEntrant);
+        
+        //Chargement de Beans:
+        ReceivingB = new ReceivingBean(LoadPort(), this.jCheckBox_MessageEntrant, this.jTextField_Reception);
+        SearchB = new SearchBean(Config.getProperty("FilePath","SavedEnv.ser"), jComboBox_CommandeEnCours);
+        PrepareB = new PrepareOrderBean();
+        
+        //SearchB s'abonne au PropertyChange de ReceivingB:
+        ReceivingB.addPropertyChangeListener(SearchB);
+        
+        //PrepareB s'abonne au SearchFoundEvent de SearchB:
+        SearchB.addSearchFoundEventListener(PrepareB);
+        
+        //ReceivingB s'abonne a l'event de PrepareB:
+        PrepareB.addInstockEventListener(ReceivingB);
     }
 
     /**
@@ -107,6 +120,7 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
         jButton_VerifDispo.setText("Validation Choix Disponnibilitée");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         jCheckBox_MessageEntrant.setAlignmentY(0.0F);
         jCheckBox_MessageEntrant.setFocusable(false);
@@ -122,8 +136,6 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
         });
 
         jLabel_CommandeEnCours.setText("Commande en Cours :");
-
-        jComboBox_CommandeEnCours.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jTextField_Reception.setText(">>");
 
@@ -199,42 +211,43 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
                 .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel_DetailCommande)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jCheckBox_MessageEntrant)
-                                                .addGap(4, 4, 4)
-                                                .addComponent(jLabel_CommandeEnCours1))
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addGap(4, 4, 4)
-                                                .addComponent(jButton_LectureMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                        .addGap(97, 97, 97)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jComboBox_CommandeEnCours, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel_CommandeEnCours)))
-                                    .addComponent(jTextField_Reception, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel_Image, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel_DetailCommande)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(jCheckBox_MessageEntrant)
+                                                    .addGap(4, 4, 4)
+                                                    .addComponent(jLabel_CommandeEnCours1))
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addGap(4, 4, 4)
+                                                    .addComponent(jButton_LectureMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addGap(97, 97, 97)
+                                                    .addComponent(jComboBox_CommandeEnCours, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(jLabel_CommandeEnCours)
+                                                    .addGap(15, 15, 15))))
+                                        .addComponent(jTextField_Reception, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jLabel_Image, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jRadioButton_Dispo)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jRadioButton_PasDispo))
+                                .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap(24, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(jRadioButton_Dispo)
-                                        .addGap(23, 23, 23)
-                                        .addComponent(jRadioButton_PasDispo))
-                                    .addComponent(jToggleButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(26, 26, 26))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jButton_Send, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(71, 71, 71))))))
+                        .addComponent(jButton_Send, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(53, 53, 53))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -244,13 +257,13 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(60, 60, 60)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel_CommandeEnCours)
-                                    .addComponent(jCheckBox_MessageEntrant, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jCheckBox_MessageEntrant, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel_CommandeEnCours1)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel_CommandeEnCours1)
+                                    .addComponent(jLabel_CommandeEnCours))
                                 .addGap(14, 14, 14)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jComboBox_CommandeEnCours, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -265,15 +278,16 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jToggleButton1)
-                        .addGap(18, 18, 18)
+                        .addGap(11, 11, 11)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jRadioButton_PasDispo)
                             .addComponent(jRadioButton_Dispo))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jToggleButton1)
                         .addGap(18, 18, 18)
                         .addComponent(jButton_Send, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         pack();
@@ -281,90 +295,24 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
 
     @SuppressWarnings("null")
     private void jButton_LectureMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_LectureMessageActionPerformed
+        //Lors de l'appuis sur le bouton lire
         Commandes tmp = null;
 
-
-        String m = Server.getMessage();
-        if(m == null){
-            Server.setEndReceiving();
-            Server = new NetworkBasicServer( this.loadPort() , this.jCheckBox_MessageEntrant);
-            return;
-        } 
-        if(m.equals("")){
-            
-        }
-            
-        StringTokenizer Message = new StringTokenizer(m,";");
-            
-        String t = "";
-        t = Message.nextToken();
-            
-        if(!Message.hasMoreTokens()) return;
+        //On dit au bean de lire
+        tmp = ReceivingB.Lire();
         
-            
-        switch(t){
-            case "Commandes.CommandesLubrifiants":
-                tmp = new CommandesLubrifiants();
-                break;
-                    
-            case "Commandes.CommandesPièces":
-                tmp = new CommandesPièces();
-                break;
-                    
-            case "Commandes.CommandesPneux":
-                tmp = new CommandesPneux();
-                break;
-                    
-            default:
-                return;
-        }
-            
-        t = Message.nextToken();
-        tmp.setLibellé(t);
-            
-        t = Message.nextToken();
-        tmp.setType(t);
-            
-        t = Message.nextToken();
-        tmp.setQuantité(Integer.parseInt(t));
-            
-        t = Message.nextToken();
-            
-        switch(t){
-            case "URGENT":
-                tmp.setPriorité(Commandes.Priorité.URGENT);
-                break;
-                    
-            case "NORMAL":
-                tmp.setPriorité(Commandes.Priorité.NORMAL);
-                break;
-                
-            case "PASPRIORITAIRE":
-                tmp.setPriorité(Commandes.Priorité.PASPRIORITAIRE);
-                break;
-                
-            default:
-                tmp.setPriorité(Commandes.Priorité.PASPRIORITAIRE);
-                break;
-        }
+        if(tmp == null) return;
         
-        //Ajout au TextField
-        this.jTextField_Reception.setText(">>  "+tmp);
-
-        //Creation Jtable
+        
+        //Remet a jours les informations contenues dans la table
         RefreshJtable(tmp);
-        status = true;
     }//GEN-LAST:event_jButton_LectureMessageActionPerformed
 
     private void jButton_SendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SendActionPerformed
-        if(status == false) return;
         if(this.buttonGroup2.getSelection() == null) return;
         
-        if(jRadioButton_Dispo.isSelected())
-            Server.sendMessage("OK");
-        else Server.sendMessage("KO");
         
-        this.status = false;
+        SearchB.Reponse(jRadioButton_Dispo.isSelected());
         this.buttonGroup2.clearSelection();
     }//GEN-LAST:event_jButton_SendActionPerformed
 
@@ -396,69 +344,12 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
     private javax.swing.JToggleButton jToggleButton1;
     // End of variables declaration//GEN-END:variables
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        
-        
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ApplicationCentrale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ApplicationCentrale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ApplicationCentrale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ApplicationCentrale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        
-        ApplicationCentrale App = new ApplicationCentrale();
-        if(App.getServer() == null){
-            System.exit(0);
-        }
-        App.setVisible(true);
-        
-    }
-    
-    private int loadPort(){
-        int Port;
-        
-        try{
-            Port = Integer.parseInt( Config.getProperty("Port", ""));
-        } catch(NumberFormatException ex){
-          Port = 50500;
-          Config.setProperty("Port", String.valueOf(Port));
-        }
-        
-        if(Port < 50000 || Port >= 65000){
-            Port = 50500;
-            Config.setProperty("Port", String.valueOf(Port));
-        }
-        
-        return Port;
-    }
-    
-    public NetworkBasicServer getServer() {
-        return Server;
-    }
     
     private void RefreshJtable(Commandes tmp){
         
         DefaultTableModel tablemodel = (DefaultTableModel) this.jTable_DetailCommande.getModel();
         
+        //Supprime les anciens Row
         tablemodel.setRowCount(0);
         
         //Ajout Libellé
@@ -493,4 +384,63 @@ public class ApplicationCentrale extends javax.swing.JFrame implements Serializa
         
         jTable_DetailCommande.setModel(tablemodel);
     }
+    
+    //Permet de récupéré le port du server
+    private int LoadPort(){
+        int Port;
+        
+        //Regarde si le port est dans le fichier Config, et si ce dernier est bien un nombre
+        try{
+            Port = Integer.parseInt( Config.getProperty("Port", ""));
+        } catch(NumberFormatException ex){
+          //Si ce n'est ni l'un ni l'autre on remet le port par défaut
+          Port = 50500;
+          Config.setProperty("Port", String.valueOf(Port));
+        }
+        
+        //Si le port n'est pas dans la plage allouée, on met le port par défaut.
+        if(Port < 50000 || Port >= 65000){
+            Port = 50500;
+            Config.setProperty("Port", String.valueOf(Port));
+        }
+        
+        return Port;
+    }
+    
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ApplicationCentrale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ApplicationCentrale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ApplicationCentrale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ApplicationCentrale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        
+        
+        ApplicationCentrale App = new ApplicationCentrale();
+        if(App.ReceivingB == null){
+            System.exit(0);
+        }
+        App.setVisible(true);
+    } 
 }

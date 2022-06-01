@@ -60,8 +60,6 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
         
         RadioButtonEntretien.setSelected(true);
         ComboBox_TypeTravail.setModel(new DefaultComboBoxModel<String>(LsEntretien.toArray(new String[0]))); //Init Entretien
-
-        
     }
 
     /**
@@ -258,9 +256,7 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
         try {
             Voit.setType(new TypeVoiture(TextField_MarqueVoiture.getText(), TextField_TypeVoiture.getText()));
         } catch (MissingTradeMarkException ex) {
-            
         }
-        
         
         if(CheckBox_PlaqueBelge.isSelected())   
             Voit.setPlaque(TextField_Immatriculation.getText() + "-BE");
@@ -269,34 +265,29 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
         
         Voit.setClient(new Client((String) ComboBox_Propriétaire.getSelectedItem(),null));
         
+        
+        Travail trav = null;
+        
         if(RadioButtonEntretien.isSelected()){
-            Entretien Ent = new Entretien(Voit);
-            Ent.setTypeTravail("Entretien: " + ComboBox_TypeTravail.getSelectedItem());
-            
-            if(Parent.getUser().getClass().getSimpleName().equals("Mecanicien")){
-                Ent.setMecano((Mecanicien) Parent.getUser());
-            }
-            
-            Ent.setMessage(TextArea_Instruction.getText());
-            
-            //Ajout à la liste située dans la classe Atelier:
-            Parent.getContainer().getListeTravaux().add((Travail) Ent);
-            Parent.Log().PrintLN("Travaux à Prévoir","Creation d'un nouveau Travail " + Ent);
+            trav = new Entretien(Voit);
+            trav.setTypeTravail("Entretien: " + ComboBox_TypeTravail.getSelectedItem());   
         }
         else{
-            Reparation Rep = new Reparation(Voit);
-            Rep.setTypeTravail("Reparation: " + ComboBox_TypeTravail.getSelectedItem());
-            
-            if(Parent.getUser().getClass().getSimpleName().equals("Mecanicien")){
-                Rep.setMecano((Mecanicien) Parent.getUser());
-            }
-            
-            Rep.setMessage(TextArea_Instruction.getText());
-            
-            //Ajout à la liste située dans la classe Atelier:
-            Parent.getContainer().getListeTravaux().add((Travail) Rep);
-            Parent.Log().PrintLN("Travaux à Prévoir","Creation d'un nouveau Travail " + Rep);
+            trav = new Reparation(Voit);
+            trav.setTypeTravail("Reparation: " + ComboBox_TypeTravail.getSelectedItem());
         }
+        if(Parent.getUser().getClass().getSimpleName().equals("Mecanicien")){
+            trav.setMecano((Mecanicien) Parent.getUser());
+        }
+            
+        trav.setMessage(TextArea_Instruction.getText());
+            
+        
+        //Ajout à la liste située dans la classe Atelier:
+        Parent.getContainer().getListeTravaux().add((Travail) trav);
+        Parent.SaveContainer();
+        
+        Parent.Log().PrintLN("Travaux à Prévoir","Creation d'un nouveau Travail " + trav);
         
         this.dispose();
         Parent.Log().PrintLN("Travaux à Prévoir","Fermeture");

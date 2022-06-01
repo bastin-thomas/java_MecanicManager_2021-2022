@@ -39,24 +39,6 @@ public class FichierLog {
         maintenant = maintenant.replaceAll("/", "-");
         
         Name = Name + maintenant;
-        
-        try {
-            inputStream = new BufferedReader(new FileReader(FilePath + Name + Extension));
-        } catch (FileNotFoundException ex) {
-            try {
-                File d = new File("Logs");
-                d.mkdir();
-                outputStream = new BufferedWriter(new FileWriter(FilePath + Name + Extension));
-                outputStream.close();
-                outputStream = null;
-                
-                inputStream = new BufferedReader(new FileReader(FilePath + Name + Extension));
-            } catch (FileNotFoundException ex1) {
-                Logger.getLogger(FichierLog.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (IOException ex1) {
-                Logger.getLogger(FichierLog.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        }
     }
     
     public void PrintLN(String App,String Message){
@@ -68,6 +50,7 @@ public class FichierLog {
                 d.mkdir();
                 outputStream = new BufferedWriter(new FileWriter(FilePath + Name + Extension, true));
             }
+            
             
             String maintenant = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, Locale.FRANCE).format(new Date());
             
@@ -84,6 +67,13 @@ public class FichierLog {
     }
     
     public int Length() throws IOException{
+        
+        try {
+            inputStream = new BufferedReader(new FileReader(FilePath + Name + Extension));
+        } catch (FileNotFoundException ex) {
+            return 0;
+        }
+        
         int i = 0;
         String str;
         while((str = inputStream.readLine()) != null && str.length()!=0){

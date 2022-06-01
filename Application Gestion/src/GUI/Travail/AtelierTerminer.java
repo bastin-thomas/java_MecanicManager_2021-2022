@@ -125,6 +125,7 @@ public class AtelierTerminer extends javax.swing.JDialog {
                     Parent.Log().PrintLN("Fin Travail","Fermeture");
                     this.dispose();
                     Parent.RefreshUI();
+                    Parent.SaveContainer();
                 }
                 else{
                     JOptionPane.showMessageDialog(this,"Le Pont1 est Vide.","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -141,6 +142,7 @@ public class AtelierTerminer extends javax.swing.JDialog {
                     Parent.Log().PrintLN("Fin Travail","Fermeture");
                     this.dispose();
                     Parent.RefreshUI();
+                    Parent.SaveContainer();
                 }
                 else{
                     JOptionPane.showMessageDialog(this,"Le Pont2 est Vide.","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -157,6 +159,7 @@ public class AtelierTerminer extends javax.swing.JDialog {
                     Parent.Log().PrintLN("Fin Travail","Fermeture");
                     this.dispose();
                     Parent.RefreshUI();
+                    Parent.SaveContainer();
                 }            
                 else{
                     JOptionPane.showMessageDialog(this,"Le Pont3 est Vide.","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -173,6 +176,7 @@ public class AtelierTerminer extends javax.swing.JDialog {
                     Parent.Log().PrintLN("Fin Travail","Fermeture");
                     this.dispose();
                     Parent.RefreshUI();
+                    Parent.SaveContainer();
                 }               
                 else{
                     JOptionPane.showMessageDialog(this,"Le Pont4 est Vide.","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -189,6 +193,7 @@ public class AtelierTerminer extends javax.swing.JDialog {
                     Parent.Log().PrintLN("Fin Travail","Fermeture");
                     this.dispose();
                     Parent.RefreshUI();
+                    Parent.SaveContainer();
                 }
                 else{
                     JOptionPane.showMessageDialog(this,"Le Sol est Vide.","Erreur", JOptionPane.ERROR_MESSAGE);

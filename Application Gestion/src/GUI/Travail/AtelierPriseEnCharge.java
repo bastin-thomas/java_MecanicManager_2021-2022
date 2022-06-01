@@ -175,7 +175,9 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
                         
                         Parent.Log().PrintLN("Prise en Charge d'un Travail","Fermeture");
                         this.dispose();
+                        
                         Parent.RefreshUI();
+                        Parent.SaveContainer();
                     }
                     else
                         JOptionPane.showMessageDialog(this,"Le Poste Choisi est déjà utilisé","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -191,6 +193,7 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
                         Parent.Log().PrintLN("Prise en Charge d'un Travail","Fermeture");
                         this.dispose();
                         Parent.RefreshUI();
+                        Parent.SaveContainer();
                     }
                     else
                         JOptionPane.showMessageDialog(this,"Le Poste Choisi est déjà utilisé","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -206,6 +209,7 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
                         Parent.Log().PrintLN("Prise en Charge d'un Travail","Fermeture");
                         this.dispose();
                         Parent.RefreshUI();
+                        Parent.SaveContainer();
                     }
                     else
                         JOptionPane.showMessageDialog(this,"Le Poste Choisi est déjà utilisé","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -221,6 +225,7 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
                         Parent.Log().PrintLN("Prise en Charge d'un Travail","Fermeture");
                         this.dispose();
                         Parent.RefreshUI();
+                        Parent.SaveContainer();
                     }
                     else
                         JOptionPane.showMessageDialog(this,"Le Poste Choisi est déjà utilisé","Erreur", JOptionPane.ERROR_MESSAGE);
@@ -239,6 +244,7 @@ public class AtelierPriseEnCharge extends javax.swing.JDialog {
                 Parent.Log().PrintLN("Prise en Charge d'un Travail","Fermeture");
                 this.dispose();
                 Parent.RefreshUI();
+                Parent.SaveContainer();
             }
             else
                 JOptionPane.showMessageDialog(this,"Le Poste Choisi est déjà utilisé","Erreur", JOptionPane.ERROR_MESSAGE);
