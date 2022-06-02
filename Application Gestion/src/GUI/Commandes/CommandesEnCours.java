@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author matteoarnone
  */
-public class CommandesHistoriques extends javax.swing.JDialog {
+public class CommandesEnCours extends javax.swing.JDialog {
 
     private final Atelier Parent;
     
@@ -21,7 +21,7 @@ public class CommandesHistoriques extends javax.swing.JDialog {
      * @param parent
      * @param modal
      */
-    public CommandesHistoriques(java.awt.Frame parent, boolean modal) {
+    public CommandesEnCours(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         //On récupère la ref vers le parent
@@ -122,7 +122,6 @@ public class CommandesHistoriques extends javax.swing.JDialog {
             vec.add(cmd.getType());
             vec.add(cmd.getQuantité());
             
-            System.out.println(vec);
             model.addRow(vec);
         }
         

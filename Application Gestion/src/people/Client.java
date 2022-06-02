@@ -61,7 +61,7 @@ public class Client extends Personne
 
     @Override
     public String toString() {
-        return "Client{" + "numClient=" + _numClient + ", _nom=" + _nom + ", _prenom=" + _prenom + ", _adresse=" + _adresse + ", _numtel=" + _numtel +"}";
+        return _nom + ", " + _prenom ;
     }
 
     @Override
@@ -73,6 +73,7 @@ public class Client extends Personne
     public void setId(String id) {
         setNumClient(Integer.parseInt(id));
     }
+    
     
     public static void main(String[] args) {
         Client c1 = new Client();   

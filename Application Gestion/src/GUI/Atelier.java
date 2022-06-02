@@ -22,8 +22,13 @@ import javax.swing.JMenuItem;
 import FichierLogPackage.FichierLog;
 import Container.ContainerClass;
 import ClockThread.Clock;
-import GUI.Commandes.CommandesHistoriques;
+import Commandes.Commandes;
+import GUI.Aide.PourDebuter;
+import GUI.Client.AjouterClient;
+import GUI.Commandes.CommandesEnCours;
+import GUI.Commandes.ReceptionCommandes;
 import GUI.Paramètre.ChoixFormatDate;
+import GUI.Paramètre.InfoSystème;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -36,12 +41,15 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 import network.NetworkBasicClient;
+import people.Client;
 import people.Employe;
 import people.Mecanicien;
 import people.Personne;
@@ -61,6 +69,8 @@ public class Atelier extends javax.swing.JFrame
     
     public final String  FilePath;
     private ContainerClass Container;
+    private Properties Config;
+    
     private Personne User;
     private FichierLog log;
     
@@ -70,62 +80,21 @@ public class Atelier extends javax.swing.JFrame
     
     private Clock thread;
     
-    @SuppressWarnings({"Convert2Lambda", "OverridableMethodCallInConstructor", "ConvertToTryWithResources"})
+    
+    
+
     public Atelier(String username) {
-        initComponents();
-        
         log = new FichierLog();
         thread = null;
         
-        //Ajout des composants de la bar de menu       
-        JMenu para, aide;
-        JMenuItem info,debut,apropos, date;
-    
-        MenuBar.add(Box.createHorizontalGlue());
-        para = new JMenu("Paramètres");
-        info = new JMenuItem("Infos système");
-        date = new JMenuItem("Format Date");
-        para.add(info);
-        para.add(date);
+        initComponents();
         
-        aide = new JMenu("Aide");
-        debut = new JMenuItem("Pour débuter");
-        apropos = new JMenuItem("A propos de...");
-        
-        aide.add(debut);
-        aide.addSeparator();
-        aide.add(apropos);
-        
-        MenuBar.add(Box.createHorizontalGlue());
-        MenuBar.add(para);
-        MenuBar.add(aide);
-         
-        apropos.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) { 
-                    APropos ap = new APropos(null,true);
-                    ap.setVisible(true);
-                }
-        });
-        
-        
-        //Permet de prendre en paramètre la ref vers cette fenètre
-        date.addActionListener(new ActionListener() {
-            Atelier Parent;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ChoixFormatDate date = new ChoixFormatDate(Parent,true); //Lancement de la fenètre lors de l'action performed.
-                date.setVisible(true);
-            }
-
-            public ActionListener setParams(Atelier parent) {
-
-                this.Parent = parent;
-                return this;
-            }
-        }.setParams((Atelier)this));
-        
+        InitMyComponents();
+        this.Menu_Facture.setEnabled(false);
+                
+        //Placer l'horloge aligné a droite:
+        jLabel_HoroDateHeure.setHorizontalAlignment(SwingConstants.RIGHT);
+                
         //Override Croix de fermeture
         this.setDefaultCloseOperation(Atelier.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter()
@@ -145,11 +114,84 @@ public class Atelier extends javax.swing.JFrame
             }
         }.setParams((Atelier)this));
         
+        //Chargement Fichier Properties
+        Config = LoadConfig();
+        
+        //Chargement du FilePath
+        FilePath = Config.getProperty("FileName", "SavedEnvironment") + ".ser";
+        //Chargement du Conteneur
+        LoadContainer();
+        
+        Log().PrintLN("Atelier","Chargement de l'état du programme Atelier");
+        
+        //Init Utilisateur courant
+        User =  searchUser(username);
         
         
+        //Lancement des Serveurs:
+        this.Lubrifiants = CommandesLubrifiants.CreateClient(Config);
+        this.Pièces = CommandesPièces.CreateClient(Config);
+        this.Pneux = CommandesPneux.CreateClient(Config);
         
-        FilePath = "SavedEnvironment"+ username +".ser";
+        //Lancement du ThreadClock pour rafraichir l'horloge
+        this.StartClock();
         
+        RefreshUI();
+        
+        //Si Utilisateur est technicien extérieur certains button disable
+        if(User.getClass().getCanonicalName().equals("people.TechnicienExterieur")){
+            this.Menu_Clients.setEnabled(false);
+            this.Menu_Materiel.setEnabled(false);
+            return;
+        }
+        
+    }
+
+    public void StartClock(){
+        //Creation du thread
+        if(thread == null) thread = new Clock(this);
+        
+        //Si le Thread est déjà lancer
+        if(!thread.isAlive()){
+            thread.start();
+        }
+    }
+    
+    
+    private Personne searchUser(String username){
+        Personne PerTmp = null;
+        //Recherche de l'objet représentant l'utilisateur:
+        for (Iterator it = this.getContainer().getUsers().iterator(); it.hasNext();) {
+            PerTmp = (Personne) it.next();
+            if(PerTmp.getNom().equals(username)){    
+                break;
+            }
+        }
+                    
+        //On set l'utilisateur de l'atelier, si il n'existe pas on le crée
+        if(PerTmp != null){
+            return PerTmp;
+        }
+        else{
+            PerTmp = new Mecanicien(username,"Inconnus");
+            this.getContainer().getUsers().add(PerTmp);
+            return PerTmp;
+        }
+    }
+    
+    //Permet de Sauvegarder l'état du conteneur, contenant toutes les infos du système.
+    public void SaveContainer(){
+        try {
+            ObjectOutputStream ObjectOUT = new ObjectOutputStream(new FileOutputStream(FilePath));
+            ObjectOUT.writeObject(getContainer());
+            ObjectOUT.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Atelier.class.getName()).log(Level.SEVERE, null, ex);
+        }      
+        Log().PrintLN("Atelier","Sauvegarde de l'état du programme Atelier");
+    }
+    
+    public void LoadContainer(){
         //Chargement de l'état du programme a son ouverture :
         try {
             //Load Container:
@@ -163,6 +205,13 @@ public class Atelier extends javax.swing.JFrame
             //Si il n'y a rien à charger, On met en mémoire ses données par défaut
             ContainerClass tmp = new ContainerClass();
             
+            Vector Clients = new Vector();
+            Clients.add(new Client("Jacques","Sançons"));
+            Clients.add(new Client("Pierre","Sançons"));
+            Clients.add(new Client("Pol","Sançons"));
+            Clients.add(new Client("Michel","Sançons"));
+            tmp.setClients(Clients);
+            
             Vector Users = new Vector();
             
             Users.add(new Mecanicien("Moteur","M0001","Wagner","JeanMarc","95 UneRueAuHazard 4042 UneCommune","04777777777"));
@@ -172,7 +221,7 @@ public class Atelier extends javax.swing.JFrame
 
             Users.add(new TechnicienExterieur("M0011","Engels","Valerie"));
             Users.add(new TechnicienExterieur("M0012","Thiernesse","Cédric"));
-            Users.add(new TechnicienExterieur("M001Server.setEndReceiving();3","Vanstapel","Herman"));
+            Users.add(new TechnicienExterieur("M0013","Vanstapel","Herman"));
             tmp.setUsers(Users);
             
             //Etat Par Defaut
@@ -184,45 +233,40 @@ public class Atelier extends javax.swing.JFrame
         } catch (IOException | ClassNotFoundException ex) {
             Log().PrintLN("ApplicationCentrale", Atelier.class.getName() + " " + Level.SEVERE + ": " + ex);
         }
-        Log().PrintLN("Atelier","Chargement de l'état du programme Atelier");
-        
-        
-        //Init Utilisateur courant
-        User =  searchUser(username);
-        
-        
-        //Lancement des Serveurs:
-        this.Lubrifiants = CommandesLubrifiants.CreateClient();
-        this.Pièces = CommandesPièces.CreateClient();
-        this.Pneux = CommandesPneux.CreateClient();
-        
-        this.StartClock();
-        
-        RefreshUI();
     }
     
     
-    //Permet de Sauvegarder l'état du conteneur, contenant toutes les infos du système.
-    @SuppressWarnings("ConvertToTryWithResources")
-    public void SaveContainer(){
+    public Properties LoadConfig(){
+        Properties tmp;
+        
+        //Chargement du fichier Config
+        tmp = new Properties();
+        
         try {
-            ObjectOutputStream ObjectOUT = new ObjectOutputStream(new FileOutputStream(FilePath));
-            ObjectOUT.writeObject(getContainer());
-            ObjectOUT.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Atelier.class.getName()).log(Level.SEVERE, null, ex);
-        }      
-        Log().PrintLN("Atelier","Sauvegarde de l'état du programme Atelier");
-    }
-    
-    public void StartClock(){
-        //Creation du thread
-        if(thread == null) thread = new Clock(this);
-        
-        //Si le Thread est déjà lancer
-        if(!thread.isAlive()){
-            thread.start();
+            tmp.load(new FileInputStream("Config.properties"));
         }
+        catch (FileNotFoundException ex) {
+            //A remplacer par une jdialog prenant le nom, l'ip et le port distant pour ensuite les ajouter ici.
+            tmp.setProperty("Ip_Serveur_CommandesLubrifiant",    "127.0.0.1");
+            tmp.setProperty("Port_Serveur_CommandesLubrifiant",       "50500");
+            tmp.setProperty("Ip_Serveur_CommandesPièces",        "127.0.0.1");
+            tmp.setProperty("Port_Serveur_CommandesPièces",           "50501");
+            tmp.setProperty("Ip_Serveur_CommandesPneux",         "127.0.0.1");
+            tmp.setProperty("Port_Serveur_CommandesPneux",            "50502");
+            tmp.setProperty("FileName", "SavedEnvironment");
+            
+            try {
+                tmp.store(new FileOutputStream("Config.properties"),"Fichier de Configuration du Programme: ");
+            } catch (FileNotFoundException ex1) {
+                Logger.getLogger(Commandes.class.getName()).log(Level.SEVERE, null, ex1);
+            } catch (IOException ex1) {
+                Logger.getLogger(Commandes.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Commandes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return tmp;
     }
     
     public void RefreshUI(){
@@ -284,28 +328,6 @@ public class Atelier extends javax.swing.JFrame
         }
         setVisible(true);
     }
-    
-    
-    private Personne searchUser(String username){
-        Personne PerTmp = null;
-        //Recherche de l'objet représentant l'utilisateur:
-        for (Iterator it = this.getContainer().getUsers().iterator(); it.hasNext();) {
-            PerTmp = (Personne) it.next();
-            if(PerTmp.getNom().equals(username)){    
-                break;
-            }
-        }
-                    
-        //On set l'utilisateur de l'atelier, si il n'existe pas on le crée
-        if(PerTmp != null){
-            return PerTmp;
-        }
-        else{
-            PerTmp = new Mecanicien(username,"Inconnus");
-            this.getContainer().getUsers().add(PerTmp);
-            return PerTmp;
-        }
-    }
 
     
     /**
@@ -361,6 +383,7 @@ public class Atelier extends javax.swing.JFrame
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         MenuItem_ListeCommandes = new javax.swing.JMenuItem();
         Menu_Clients = new javax.swing.JMenu();
+        jMenuItem_AjouterClient = new javax.swing.JMenuItem();
         Menu_Facture = new javax.swing.JMenu();
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -445,6 +468,8 @@ public class Atelier extends javax.swing.JFrame
 
         jLabel_HoroDateHeure.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel_HoroDateHeure.setText("Dates");
+        jLabel_HoroDateHeure.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jLabel_HoroDateHeure.setIconTextGap(0);
 
         MenuBar.setBackground(new java.awt.Color(242, 242, 242));
         MenuBar.setToolTipText("");
@@ -517,6 +542,11 @@ public class Atelier extends javax.swing.JFrame
         Menu_Materiel.add(MenuItem_Commander);
 
         MenuItem_Receptionner.setText("Réceptionner");
+        MenuItem_Receptionner.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItem_ReceptionnerActionPerformed(evt);
+            }
+        });
         Menu_Materiel.add(MenuItem_Receptionner);
         Menu_Materiel.add(jSeparator4);
 
@@ -531,6 +561,15 @@ public class Atelier extends javax.swing.JFrame
         MenuBar.add(Menu_Materiel);
 
         Menu_Clients.setText("Clients");
+
+        jMenuItem_AjouterClient.setText("Ajouter");
+        jMenuItem_AjouterClient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_AjouterClientActionPerformed(evt);
+            }
+        });
+        Menu_Clients.add(jMenuItem_AjouterClient);
+
         MenuBar.add(Menu_Clients);
 
         Menu_Facture.setText("Facture");
@@ -585,11 +624,13 @@ public class Atelier extends javax.swing.JFrame
                             .addComponent(TextField_Pont4)
                             .addComponent(TextField_Sol)
                             .addComponent(TextField_Divers))
-                        .addGap(45, 45, 45)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel_HoroDateHeure, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(ImageFond, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(57, 57, 57)
+                        .addComponent(ImageFond)
                         .addContainerGap())))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel_HoroDateHeure, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -651,7 +692,73 @@ public class Atelier extends javax.swing.JFrame
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    
+    private void InitMyComponents(){
+        //Ajout des composants de la bar de menu       
+        JMenu para, aide;
+        JMenuItem info,debut,apropos, date;
+    
+        MenuBar.add(Box.createHorizontalGlue());
+        para = new JMenu("Paramètres");
+        info = new JMenuItem("Infos système");
+        date = new JMenuItem("Format Date");
+        para.add(info);
+        para.add(date);
+        
+        aide = new JMenu("Aide");
+        debut = new JMenuItem("Pour débuter");
+        apropos = new JMenuItem("A propos de...");
+        
+        aide.add(debut);
+        aide.addSeparator();
+        aide.add(apropos);
+        
+        MenuBar.add(Box.createHorizontalGlue());
+        MenuBar.add(para);
+        MenuBar.add(aide);
+         
+        info.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) { 
+                    InfoSystème ap = new InfoSystème(null, true);
+                    ap.setVisible(true);
+                }
+        });
+        
+        apropos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) { 
+                    APropos ap = new APropos(null,true);
+                    ap.setVisible(true);
+                }
+        });
+        
+        debut.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) { 
+                    PourDebuter ap = new PourDebuter();
+                    ap.setVisible(true);
+                }
+        });
+        
+        //Permet de prendre en paramètre la ref vers cette fenètre
+        date.addActionListener(new ActionListener() {
+            Atelier Parent;
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ChoixFormatDate date = new ChoixFormatDate(Parent,true); //Lancement de la fenètre lors de l'action performed.
+                date.setVisible(true);
+            }
+
+            public ActionListener setParams(Atelier parent) {
+
+                this.Parent = parent;
+                return this;
+            }
+        }.setParams((Atelier)this));
+    }
+    
     private void MenuItem_APrevoirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItem_APrevoirActionPerformed
         AtelierAPrevoir Popup = new AtelierAPrevoir(this,true);
         Popup.setVisible(true);
@@ -709,9 +816,19 @@ public class Atelier extends javax.swing.JFrame
     }//GEN-LAST:event_MenuItem_CommanderLubrifiantsActionPerformed
 
     private void MenuItem_ListeCommandesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItem_ListeCommandesActionPerformed
-        CommandesHistoriques Popup = new CommandesHistoriques(this,true);
+        CommandesEnCours Popup = new CommandesEnCours(this,true);
         Popup.setVisible(true);
     }//GEN-LAST:event_MenuItem_ListeCommandesActionPerformed
+
+    private void MenuItem_ReceptionnerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItem_ReceptionnerActionPerformed
+        ReceptionCommandes Popup = new ReceptionCommandes(this,true);
+        Popup.setVisible(true);
+    }//GEN-LAST:event_MenuItem_ReceptionnerActionPerformed
+
+    private void jMenuItem_AjouterClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_AjouterClientActionPerformed
+        AjouterClient Popup = new AjouterClient(this,true);
+        Popup.setVisible(true);
+    }//GEN-LAST:event_jMenuItem_AjouterClientActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -758,6 +875,7 @@ public class Atelier extends javax.swing.JFrame
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel_HoroDateHeure;
+    private javax.swing.JMenuItem jMenuItem_AjouterClient;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator4;
     // End of variables declaration//GEN-END:variables
@@ -812,15 +930,15 @@ public class Atelier extends javax.swing.JFrame
     
     
     
-    
-    
-    
-    
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) 
     {
         new Atelier("").setVisible(true);
+    }
+
+    public Properties getConfig() {
+        return Config;
     }
 }

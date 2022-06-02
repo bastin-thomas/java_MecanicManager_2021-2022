@@ -5,6 +5,7 @@
 package GUI.Travail;
 
 import GUI.Atelier;
+import GUI.Client.AjouterClient;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import people.Client;
@@ -59,7 +60,9 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
         Parent.Log().PrintLN("Atelier A Prévoir","Ouverture");
         
         RadioButtonEntretien.setSelected(true);
-        ComboBox_TypeTravail.setModel(new DefaultComboBoxModel<String>(LsEntretien.toArray(new String[0]))); //Init Entretien
+        ComboBox_TypeTravail.setModel(new DefaultComboBoxModel<String>(LsEntretien.toArray(new String[0])));
+        
+        this.RefreshUI();
     }
 
     /**
@@ -106,6 +109,11 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
         ComboBox_Propriétaire.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pierre", "Pol", "Jacques" }));
 
         CheckBox_New.setText("new");
+        CheckBox_New.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CheckBox_NewActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(RadioButtonEntretien);
         RadioButtonEntretien.setText("Entretien");
@@ -263,7 +271,7 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
         else    
             Voit.setPlaque(TextField_Immatriculation.getText());        
         
-        Voit.setClient(new Client((String) ComboBox_Propriétaire.getSelectedItem(),null));
+        Voit.setClient((Client) ComboBox_Propriétaire.getSelectedItem());
         
         
         Travail trav = null;
@@ -304,6 +312,14 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
         ComboBox_TypeTravail.setModel(new DefaultComboBoxModel<String>(LsReparation.toArray(new String[0])));
     }//GEN-LAST:event_RadioButtonReparationActionPerformed
 
+    private void CheckBox_NewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBox_NewActionPerformed
+        AjouterClient Popup = new AjouterClient(Parent, true);
+        Popup.setAlwaysOnTop(true);
+        Popup.setVisible(true);
+        this.RefreshUI();
+        this.CheckBox_New.setSelected(false);
+    }//GEN-LAST:event_CheckBox_NewActionPerformed
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Button_KO;
@@ -327,4 +343,17 @@ public class AtelierAPrevoir extends javax.swing.JDialog {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
+
+
+    public void RefreshUI(){
+        DefaultComboBoxModel model= (DefaultComboBoxModel) ComboBox_Propriétaire.getModel();
+        //Supprime les anciens Row
+        model.removeAllElements();
+        
+        for(int i = 0 ; i < Parent.getContainer().getClients().size() ; i++)
+        {
+            model.addElement(Parent.getContainer().getClients().get(i));
+        }
+        ComboBox_Propriétaire.setModel(model);
+    }
 }

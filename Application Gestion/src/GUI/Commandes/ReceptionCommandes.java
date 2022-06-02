@@ -6,9 +6,6 @@ package GUI.Commandes;
 
 import Commandes.Commandes;
 import GUI.Atelier;
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 /**
@@ -51,7 +48,7 @@ public class ReceptionCommandes extends javax.swing.JDialog {
 
         Label_TravauxAttente.setText("Listes Commandes en Cours:");
 
-        Bouton_OK.setText("Supprimer");
+        Bouton_OK.setText("Réceptionner");
         Bouton_OK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Bouton_OKActionPerformed(evt);
@@ -76,16 +73,15 @@ public class ReceptionCommandes extends javax.swing.JDialog {
                 .addComponent(Label_TravauxAttente)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jComboBox_Commandes, javax.swing.GroupLayout.PREFERRED_SIZE, 478, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(96, 96, 96)
-                        .addComponent(Bouton_OK)
-                        .addGap(59, 59, 59)
-                        .addComponent(Bouton_KO, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(110, 110, 110)
+                .addComponent(Bouton_OK)
+                .addGap(56, 56, 56)
+                .addComponent(Bouton_KO, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(123, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jComboBox_Commandes, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,6 +112,7 @@ public class ReceptionCommandes extends javax.swing.JDialog {
         this.RefreshTable();
         Parent.SaveContainer();
         
+        this.dispose();
     }//GEN-LAST:event_Bouton_OKActionPerformed
 
     private void Bouton_KOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Bouton_KOActionPerformed

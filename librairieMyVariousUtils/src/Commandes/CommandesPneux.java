@@ -5,6 +5,7 @@
  */
 package Commandes;
 
+import java.util.Properties;
 import network.*;
 
 /**
@@ -20,7 +21,7 @@ public class CommandesPneux extends Commandes{
      *
      * @return
      */
-    public static int loadPort() {
+    public static int loadPort(Properties Config) {
         int Port;
         
         try{
@@ -38,7 +39,7 @@ public class CommandesPneux extends Commandes{
         return Port;
     }
 
-    public static NetworkBasicClient CreateClient(){
+    public static NetworkBasicClient CreateClient(Properties Config){
         
         String Adresse = Config.getProperty("Ip_Serveur_CommandesPneux","");
         if(Adresse.equals("")){
@@ -47,7 +48,7 @@ public class CommandesPneux extends Commandes{
         
 
         //Tentative Creation du Serveur
-        NetworkBasicClient tmp = new NetworkBasicClient(Adresse,loadPort());
+        NetworkBasicClient tmp = new NetworkBasicClient(Adresse,loadPort(Config));
         
         System.out.toString();
         

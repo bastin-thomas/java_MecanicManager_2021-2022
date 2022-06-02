@@ -18,6 +18,10 @@ import travail.Travail;
  */
 public class ContainerClass implements Serializable {
     
+    //Vecteur des Clients
+    private Vector Clients;
+    
+    //Vecteur des Utilisateurs de l'application
     private Vector Users;
 
     //Partie Travaux
@@ -40,10 +44,20 @@ public class ContainerClass implements Serializable {
     
     public ContainerClass() 
     {
+        Clients = new Vector();
+        Users = new Vector();
+        
         ListeTravaux = new LinkedList();
         ListeTravauxFini = new LinkedList();
-        Users = new Vector();
+        
+        Pont1 = null;
+        Pont2 = null;
+        Pont3 = null;
+        Pont4 = null;
+        Sol = null;
+        
         ListeCommandes = new Vector();
+        
         EtatFormat = new Vector();
         dateformat = new SimpleDateFormat();
     }
@@ -160,4 +174,18 @@ public class ContainerClass implements Serializable {
         if(Sol == null) return true;
         else return false;
     } 
+
+    /**
+     * @return the Clients
+     */
+    public Vector getClients() {
+        return Clients;
+    }
+
+    /**
+     * @param Clients the Clients to set
+     */
+    public void setClients(Vector Clients) {
+        this.Clients = Clients;
+    }
 }

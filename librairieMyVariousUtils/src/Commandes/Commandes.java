@@ -22,35 +22,6 @@ import network.NetworkBasicClient;
 
 public abstract class Commandes implements Serializable {
     
-    protected static final Properties Config;
-    
-    static
-    {
-        Config = new Properties();
-        try {
-            Config.load(new FileInputStream("Config.properties"));
-        }
-        catch (FileNotFoundException ex) {
-            //A remplacer par une jdialog prenant le nom, l'ip et le port distant pour ensuite les ajouter ici.
-            Config.setProperty("Ip_Serveur_CommandesLubrifiant",    "127.0.0.1");
-            Config.setProperty("Port_Serveur_CommandesLubrifiant",       "50500");
-            Config.setProperty("Ip_Serveur_CommandesPièces",        "127.0.0.1");
-            Config.setProperty("Port_Serveur_CommandesPièces",           "50501");
-            Config.setProperty("Ip_Serveur_CommandesPneux",         "127.0.0.1");
-            Config.setProperty("Port_Serveur_CommandesPneux",            "50502");
-            
-            try {
-                Config.store(new FileOutputStream("Config.properties"),"Fichier de Configuration du Programme: ");
-            } catch (FileNotFoundException ex1) {
-                Logger.getLogger(Commandes.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (IOException ex1) {
-                Logger.getLogger(Commandes.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Commandes.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
     public enum Priorité {URGENT, NORMAL, PASPRIORITAIRE};
     
     private String type;

@@ -305,26 +305,23 @@ public class NewCommande extends javax.swing.JDialog {
         //Envoi au Client de la commande
         String Rep = "";
         
-            
         
-        for(int i = 0 ; i<2 ; i++)
-        {
+        for(int i = 0 ; i<2 ; i++){
             Rep = Cmd.Send(Client);
-            
             //Recuperation de la réponse
             if(Rep == null){
                 //Si null, on recrée un objet client, et on renvoie le message avec un temps d'interval de 250ms
                 Client = ResetClient();
-
+                
+                System.out.println(Client.getAdresse() + ":" + Client.getPort());
+                
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(NewCommande.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            else{
-                break;
-            }
+            else break;
         }
             
         if(Rep == null)
@@ -332,6 +329,7 @@ public class NewCommande extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this,"Erreur de connexion au Serveur","Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         } 
+        
         
         StringTokenizer Message = new StringTokenizer(Rep,";");
         String isOk;
@@ -424,13 +422,13 @@ public class NewCommande extends javax.swing.JDialog {
     {        
         switch(getName()){
             case "Lubrifiants":
-                return Parent.getLubrifiants();            
+                return CommandesLubrifiants.CreateClient(Parent.getConfig());
                     
             case "Pièces":
-                return Parent.getPièces();
+                return CommandesPièces.CreateClient(Parent.getConfig());
             
             case "Pneux":
-                return Parent.getPneux();
+                return CommandesPneux.CreateClient(Parent.getConfig());
                                             
             default:
                 Parent.Log().PrintLN("Commande" + getName(), "La commandes créer n'a pas de classe définie.");

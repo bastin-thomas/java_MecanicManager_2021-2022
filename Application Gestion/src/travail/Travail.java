@@ -112,6 +112,6 @@ public abstract class Travail implements Serializable {
 
     @Override
     public String toString() {
-        return " "+vehicule.getType().toString()+" "+vehicule.getPlaque()+" "+TypeTravail;
+        return " "+vehicule.getType().toString()+" | "+vehicule.getPlaque()+" |  "+TypeTravail;
     }    
 }

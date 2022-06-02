@@ -8,7 +8,6 @@ package applicationcentrale;
 import Beans.*;
 import Commandes.*;
 import FichierLogPackage.FichierLog;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -54,7 +53,7 @@ public class ApplicationCentrale extends javax.swing.JFrame {
             
             //A remplacer par une jdialog prenant le nom, l'ip et le port distant pour ensuite les ajouter ici.
             Config.setProperty("Name",          "Inconnu");
-            Config.setProperty("FilePath",          "" + File.separator + "SavedEnv.ser");
+            Config.setProperty("FileName",      "SavedEnv.ser");
             Config.setProperty("Port",          "50500");
             
             try {
@@ -77,7 +76,7 @@ public class ApplicationCentrale extends javax.swing.JFrame {
         
         //Chargement de Beans:
         ReceivingB = new ReceivingBean(LoadPort(), this.jCheckBox_MessageEntrant, this.jTextField_Reception);
-        SearchB = new SearchBean(Config.getProperty("FilePath","SavedEnv.ser"), jComboBox_CommandeEnCours);
+        SearchB = new SearchBean(Config.getProperty("FileName","SavedEnv.ser"), jComboBox_CommandeEnCours);
         PrepareB = new PrepareOrderBean();
         
         //SearchB s'abonne au PropertyChange de ReceivingB:
@@ -88,6 +87,11 @@ public class ApplicationCentrale extends javax.swing.JFrame {
         
         //ReceivingB s'abonne a l'event de PrepareB:
         PrepareB.addInstockEventListener(ReceivingB);
+        
+        
+        //Chargement EnvironementAppCentrale
+        SearchB.LoadContainer();
+        SearchB.RefreshUI();
     }
 
     /**
@@ -301,18 +305,24 @@ public class ApplicationCentrale extends javax.swing.JFrame {
         //On dit au bean de lire
         tmp = ReceivingB.Lire();
         
-        if(tmp == null) return;
-        
+        if(tmp == null)
+        {
+            return;
+        } 
         
         //Remet a jours les informations contenues dans la table
         RefreshJtable(tmp);
+        this.buttonGroup1.clearSelection();
     }//GEN-LAST:event_jButton_LectureMessageActionPerformed
 
     private void jButton_SendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SendActionPerformed
-        if(this.buttonGroup2.getSelection() == null) return;
+        if(this.buttonGroup2.getSelection() == null || this.buttonGroup1.getSelection() == null) return;
         
         
         SearchB.Reponse(jRadioButton_Dispo.isSelected());
+        
+        this.jTextField_Reception.setText(">> ");
+        RefreshJtable(null);
         this.buttonGroup2.clearSelection();
     }//GEN-LAST:event_jButton_SendActionPerformed
 
@@ -351,6 +361,14 @@ public class ApplicationCentrale extends javax.swing.JFrame {
         
         //Supprime les anciens Row
         tablemodel.setRowCount(0);
+        
+        //Si Commande a null, on reset l'affichage
+        if(tmp == null){
+            jTable_DetailCommande.setModel(tablemodel);
+            return;
+        }
+        
+               
         
         //Ajout Libellé
         Vector VecTmp = new Vector();

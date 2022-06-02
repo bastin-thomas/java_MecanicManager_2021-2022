@@ -43,8 +43,9 @@ public class SearchBean implements PropertyChangeListener, Serializable {
         FilePath = fp;
         SearchFoundListenerList = new ArrayList<SearchFoundEventListener>();
         combo = c;
+        Cmd = null;
         
-        LoadContainer(FilePath);
+        LoadContainer();
     }
     
     @Override
@@ -53,13 +54,14 @@ public class SearchBean implements PropertyChangeListener, Serializable {
         Container.getListeCommande().add(Cmd);
         RefreshUI();
         
-        SaveContainer(FilePath);
+        SaveContainer();
     }
     
     public void Reponse(boolean dispo){   
         if(Cmd == null) return;
         
         notifySearchFoundEvent(Cmd,dispo);
+        Cmd = null;
     }
     
     public void notifySearchFoundEvent(Commandes c, boolean dispo){
@@ -76,7 +78,7 @@ public class SearchBean implements PropertyChangeListener, Serializable {
         SearchFoundListenerList.remove(listener);
     }
     
-    private void RefreshUI(){
+    public void RefreshUI(){
         DefaultComboBoxModel model = (DefaultComboBoxModel) combo.getModel();
         //Supprime les anciens Row
         model.removeAllElements();
@@ -89,7 +91,7 @@ public class SearchBean implements PropertyChangeListener, Serializable {
     }
     
     
-    public void LoadContainer(String FilePath){
+    public void LoadContainer(){
         try {
             //Chargement des flux:
             ObjectInputStream ObjectIN = new ObjectInputStream(new FileInputStream(FilePath));
@@ -108,7 +110,7 @@ public class SearchBean implements PropertyChangeListener, Serializable {
         }
     }
     
-    public void SaveContainer(String FilePath){
+    public void SaveContainer(){
         //Chargement de l'état du programme a son ouverture :
         try {
             //Chargement des Flux:
