@@ -30,74 +30,42 @@ public abstract class Commandes implements Serializable {
     private Priorité priorité;
     
     
-    /**
-     * Get the value of type
-     *
-     * @return the value of type
-     */
+
     public String getType() {
         return type;
     }
 
-    /**
-     * Set the value of type
-     *
-     * @param Type new value of type
-     */
+
     public void setType(String Type) {
         this.type = Type;
     }
     
-    /**
-     * Get the value of libellé
-     *
-     * @return the value of libellé
-     */
+
     public String getLibellé() {
         return libellé;
     }
 
-    /**
-     * Set the value of libellé
-     *
-     * @param Libellé new value of libellé
-     */
+
     public void setLibellé(String Libellé) {
         this.libellé = Libellé;
     }
     
-    /**
-     * Get the value of quantité
-     *
-     * @return the value of quantité
-     */
+
     public int getQuantité() {
         return quantité;
     }
 
-    /**
-     * Set the value of quantité
-     *
-     * @param Quantité new value of quantité
-     */
+
     public void setQuantité(int Quantité) {
         this.quantité = Quantité;
     }
     
-    /**
-     * Get the value of Priorité
-     *
-     * @return the value of Priorité
-     */
+
     public Priorité getPriorité() {
         return priorité;
     }
 
-    /**
-     * Set the value of Priorité
-     *
-     * @param Priorité new value of Priorité
-     */
+
     public void setPriorité(Priorité prior) {
         this.priorité = prior;
     }
