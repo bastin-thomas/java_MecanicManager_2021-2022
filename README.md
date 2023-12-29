@@ -1,8 +1,5 @@
 # java_labo_2021-2022
-This Exercise was created by my teachers for the Java/Swing lessons.
-
-### Project Description:
-The project was to create an app to manage a garage. The User be able to manage car on car lift and to order piece from another app. The Two App used a basic network Library created by the teacher to communicate between them.
+>The project was to create an app to manage a garage. The User be able to manage car on car lift and to order piece from another app. The Two App used a basic network Library created by the teacher to communicate between them.
 
 
 
